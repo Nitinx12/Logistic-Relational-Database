@@ -14,15 +14,17 @@ func GetTrailers(db *sql.DB) gin.HandlerFunc {
 		rows, err := db.Query(`
 			SELECT
 				trailer_id,
-				unit_number,
+				trailer_number,
 				trailer_type,
 				length_feet,
-				capacity_lbs,
+				model_year,
+				vin,
 				acquisition_date,
 				status,
-				home_terminal
+				current_location,
+				updated_at
 			FROM trailers
-			ORDER BY unit_number
+			ORDER BY trailer_number
 		`)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -33,17 +35,18 @@ func GetTrailers(db *sql.DB) gin.HandlerFunc {
 		trailers := make([]models.Trailer, 0)
 		for rows.Next() {
 			var t models.Trailer
-			err := rows.Scan(
+			if err := rows.Scan(
 				&t.TrailerID,
-				&t.UnitNumber,
+				&t.TrailerNumber,
 				&t.TrailerType,
 				&t.LengthFeet,
-				&t.CapacityLbs,
+				&t.ModelYear,
+				&t.VIN,
 				&t.AcquisitionDate,
 				&t.Status,
-				&t.HomeTerminal,
-			)
-			if err != nil {
+				&t.CurrentLocation,
+				&t.UpdatedAt,
+			); err != nil {
 				log.Printf("[trailers] scan error: %v", err)
 				continue
 			}
@@ -66,24 +69,28 @@ func GetTrailerByID(db *sql.DB) gin.HandlerFunc {
 		err := db.QueryRow(`
 			SELECT
 				trailer_id,
-				unit_number,
+				trailer_number,
 				trailer_type,
 				length_feet,
-				capacity_lbs,
+				model_year,
+				vin,
 				acquisition_date,
 				status,
-				home_terminal
+				current_location,
+				updated_at
 			FROM trailers
 			WHERE trailer_id = $1
 		`, id).Scan(
 			&t.TrailerID,
-			&t.UnitNumber,
+			&t.TrailerNumber,
 			&t.TrailerType,
 			&t.LengthFeet,
-			&t.CapacityLbs,
+			&t.ModelYear,
+			&t.VIN,
 			&t.AcquisitionDate,
 			&t.Status,
-			&t.HomeTerminal,
+			&t.CurrentLocation,
+			&t.UpdatedAt,
 		)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "trailer not found"})

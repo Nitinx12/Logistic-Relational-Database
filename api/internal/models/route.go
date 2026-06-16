@@ -1,11 +1,16 @@
 package models
 
+import "time"
+
 type Route struct {
-	RouteID         string  `json:"route_id"`
-	RouteName       string  `json:"route_name"`
-	OriginFacility  string  `json:"origin_facility"`
-	DestFacility    string  `json:"dest_facility"`
-	DistanceMiles   float64 `json:"distance_miles"`
-	EstimatedHours  float64 `json:"estimated_hours"`
-	RouteType       string  `json:"route_type"`
+	RouteID              string     `json:"route_id"`
+	OriginCity           string     `json:"origin_city"`
+	OriginState          string     `json:"origin_state"`
+	DestinationCity      string     `json:"destination_city"`
+	DestinationState     string     `json:"destination_state"`
+	TypicalDistanceMiles int64      `json:"typical_distance_miles"`
+	BaseRatePerMile      float64    `json:"base_rate_per_mile"`
+	FuelSurchargeRate    float64    `json:"fuel_surcharge_rate"`
+	TypicalTransitDays   int64      `json:"typical_transit_days"`
+	UpdatedAt            *time.Time `json:"updated_at"`
 }

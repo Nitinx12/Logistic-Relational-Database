@@ -16,13 +16,13 @@ func GetFacilities(db *sql.DB) gin.HandlerFunc {
 				facility_id,
 				facility_name,
 				facility_type,
-				address,
 				city,
 				state,
-				zip_code,
 				latitude,
 				longitude,
-				phone_number
+				dock_doors,
+				operating_hours,
+				updated_at
 			FROM facilities
 			ORDER BY facility_name
 		`)
@@ -35,19 +35,18 @@ func GetFacilities(db *sql.DB) gin.HandlerFunc {
 		facilities := make([]models.Facility, 0)
 		for rows.Next() {
 			var f models.Facility
-			err := rows.Scan(
+			if err := rows.Scan(
 				&f.FacilityID,
 				&f.FacilityName,
 				&f.FacilityType,
-				&f.Address,
 				&f.City,
 				&f.State,
-				&f.ZipCode,
 				&f.Latitude,
 				&f.Longitude,
-				&f.PhoneNumber,
-			)
-			if err != nil {
+				&f.DockDoors,
+				&f.OperatingHours,
+				&f.UpdatedAt,
+			); err != nil {
 				log.Printf("[facilities] scan error: %v", err)
 				continue
 			}
@@ -72,26 +71,26 @@ func GetFacilityByID(db *sql.DB) gin.HandlerFunc {
 				facility_id,
 				facility_name,
 				facility_type,
-				address,
 				city,
 				state,
-				zip_code,
 				latitude,
 				longitude,
-				phone_number
+				dock_doors,
+				operating_hours,
+				updated_at
 			FROM facilities
 			WHERE facility_id = $1
 		`, id).Scan(
 			&f.FacilityID,
 			&f.FacilityName,
 			&f.FacilityType,
-			&f.Address,
 			&f.City,
 			&f.State,
-			&f.ZipCode,
 			&f.Latitude,
 			&f.Longitude,
-			&f.PhoneNumber,
+			&f.DockDoors,
+			&f.OperatingHours,
+			&f.UpdatedAt,
 		)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "facility not found"})

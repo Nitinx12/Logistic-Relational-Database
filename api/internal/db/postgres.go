@@ -26,7 +26,6 @@ func Connect() (*sql.DB, error) {
 		return nil, fmt.Errorf("failed to open postgres connection: %w", err)
 	}
 
-	// Connection pool settings
 	database.SetMaxOpenConns(25)
 	database.SetMaxIdleConns(10)
 	database.SetConnMaxLifetime(5 * time.Minute)

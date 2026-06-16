@@ -14,18 +14,16 @@ func GetCustomers(db *sql.DB) gin.HandlerFunc {
 		rows, err := db.Query(`
 			SELECT
 				customer_id,
-				company_name,
-				contact_name,
-				phone_number,
-				email,
-				address,
-				city,
-				state,
-				zip_code,
-				credit_limit,
-				payment_term_days
+				customer_name,
+				customer_type,
+				credit_terms_days,
+				primary_freight_type,
+				account_status,
+				contract_start_date,
+				annual_revenue_potential,
+				updated_at
 			FROM customers
-			ORDER BY company_name
+			ORDER BY customer_name
 		`)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -36,20 +34,17 @@ func GetCustomers(db *sql.DB) gin.HandlerFunc {
 		customers := make([]models.Customer, 0)
 		for rows.Next() {
 			var cu models.Customer
-			err := rows.Scan(
+			if err := rows.Scan(
 				&cu.CustomerID,
-				&cu.CompanyName,
-				&cu.ContactName,
-				&cu.PhoneNumber,
-				&cu.Email,
-				&cu.Address,
-				&cu.City,
-				&cu.State,
-				&cu.ZipCode,
-				&cu.CreditLimit,
-				&cu.PaymentTermDays,
-			)
-			if err != nil {
+				&cu.CustomerName,
+				&cu.CustomerType,
+				&cu.CreditTermsDays,
+				&cu.PrimaryFreightType,
+				&cu.AccountStatus,
+				&cu.ContractStartDate,
+				&cu.AnnualRevenuePotential,
+				&cu.UpdatedAt,
+			); err != nil {
 				log.Printf("[customers] scan error: %v", err)
 				continue
 			}
@@ -72,30 +67,26 @@ func GetCustomerByID(db *sql.DB) gin.HandlerFunc {
 		err := db.QueryRow(`
 			SELECT
 				customer_id,
-				company_name,
-				contact_name,
-				phone_number,
-				email,
-				address,
-				city,
-				state,
-				zip_code,
-				credit_limit,
-				payment_term_days
+				customer_name,
+				customer_type,
+				credit_terms_days,
+				primary_freight_type,
+				account_status,
+				contract_start_date,
+				annual_revenue_potential,
+				updated_at
 			FROM customers
 			WHERE customer_id = $1
 		`, id).Scan(
 			&cu.CustomerID,
-			&cu.CompanyName,
-			&cu.ContactName,
-			&cu.PhoneNumber,
-			&cu.Email,
-			&cu.Address,
-			&cu.City,
-			&cu.State,
-			&cu.ZipCode,
-			&cu.CreditLimit,
-			&cu.PaymentTermDays,
+			&cu.CustomerName,
+			&cu.CustomerType,
+			&cu.CreditTermsDays,
+			&cu.PrimaryFreightType,
+			&cu.AccountStatus,
+			&cu.ContractStartDate,
+			&cu.AnnualRevenuePotential,
+			&cu.UpdatedAt,
 		)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "customer not found"})

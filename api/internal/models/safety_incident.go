@@ -3,16 +3,20 @@ package models
 import "time"
 
 type SafetyIncident struct {
-	IncidentID      string    `json:"incident_id"`
-	DriverID        string    `json:"driver_id"`
-	TruckID         string    `json:"truck_id"`
-	IncidentDate    time.Time `json:"incident_date"`
-	IncidentType    string    `json:"incident_type"`
-	Severity        string    `json:"severity"`
-	Location        string    `json:"location"`
-	State           string    `json:"state"`
-	Description     string    `json:"description"`
-	ReportedToFMCSA bool      `json:"reported_to_fmcsa"`
-	RecordableDOT   bool      `json:"recordable_dot"`
-	EstimatedCost   float64   `json:"estimated_cost"`
+	IncidentID        string     `json:"incident_id"`
+	TripID            string     `json:"trip_id"`
+	TruckID           string     `json:"truck_id"`
+	DriverID          string     `json:"driver_id"`
+	IncidentDate      *time.Time `json:"incident_date"`
+	IncidentType      string     `json:"incident_type"`
+	LocationCity      string     `json:"location_city"`
+	LocationState     string     `json:"location_state"`
+	AtFaultFlag       string     `json:"at_fault_flag"`
+	InjuryFlag        string     `json:"injury_flag"`
+	VehicleDamageCost float64    `json:"vehicle_damage_cost"`
+	CargoDamageCost   float64    `json:"cargo_damage_cost"`
+	ClaimAmount       float64    `json:"claim_amount"`
+	PreventableFlag   string     `json:"preventable_flag"`
+	Description       string     `json:"description"`
+	UpdatedAt         *time.Time `json:"updated_at"`
 }

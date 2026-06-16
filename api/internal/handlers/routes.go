@@ -14,14 +14,17 @@ func GetRoutes(db *sql.DB) gin.HandlerFunc {
 		rows, err := db.Query(`
 			SELECT
 				route_id,
-				route_name,
-				origin_facility,
-				dest_facility,
-				distance_miles,
-				estimated_hours,
-				route_type
+				origin_city,
+				origin_state,
+				destination_city,
+				destination_state,
+				typical_distance_miles,
+				base_rate_per_mile,
+				fuel_surcharge_rate,
+				typical_transit_days,
+				updated_at
 			FROM routes
-			ORDER BY route_name
+			ORDER BY origin_state, origin_city
 		`)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -32,16 +35,18 @@ func GetRoutes(db *sql.DB) gin.HandlerFunc {
 		routes := make([]models.Route, 0)
 		for rows.Next() {
 			var r models.Route
-			err := rows.Scan(
+			if err := rows.Scan(
 				&r.RouteID,
-				&r.RouteName,
-				&r.OriginFacility,
-				&r.DestFacility,
-				&r.DistanceMiles,
-				&r.EstimatedHours,
-				&r.RouteType,
-			)
-			if err != nil {
+				&r.OriginCity,
+				&r.OriginState,
+				&r.DestinationCity,
+				&r.DestinationState,
+				&r.TypicalDistanceMiles,
+				&r.BaseRatePerMile,
+				&r.FuelSurchargeRate,
+				&r.TypicalTransitDays,
+				&r.UpdatedAt,
+			); err != nil {
 				log.Printf("[routes] scan error: %v", err)
 				continue
 			}
@@ -64,22 +69,28 @@ func GetRouteByID(db *sql.DB) gin.HandlerFunc {
 		err := db.QueryRow(`
 			SELECT
 				route_id,
-				route_name,
-				origin_facility,
-				dest_facility,
-				distance_miles,
-				estimated_hours,
-				route_type
+				origin_city,
+				origin_state,
+				destination_city,
+				destination_state,
+				typical_distance_miles,
+				base_rate_per_mile,
+				fuel_surcharge_rate,
+				typical_transit_days,
+				updated_at
 			FROM routes
 			WHERE route_id = $1
 		`, id).Scan(
 			&r.RouteID,
-			&r.RouteName,
-			&r.OriginFacility,
-			&r.DestFacility,
-			&r.DistanceMiles,
-			&r.EstimatedHours,
-			&r.RouteType,
+			&r.OriginCity,
+			&r.OriginState,
+			&r.DestinationCity,
+			&r.DestinationState,
+			&r.TypicalDistanceMiles,
+			&r.BaseRatePerMile,
+			&r.FuelSurchargeRate,
+			&r.TypicalTransitDays,
+			&r.UpdatedAt,
 		)
 		if err == sql.ErrNoRows {
 			c.JSON(http.StatusNotFound, gin.H{"error": "route not found"})
