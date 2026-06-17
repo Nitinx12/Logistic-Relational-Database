@@ -4,7 +4,6 @@ LRDB
 ├─ .python-version
 ├─ api
 │  ├─ cmd
-│  │  ├─ bronze
 │  │  └─ server
 │  │     └─ main.go
 │  ├─ go.mod
@@ -29,6 +28,7 @@ LRDB
 │  │  │  ├─ customer.go
 │  │  │  ├─ delivery_event.go
 │  │  │  ├─ driver.go
+│  │  │  ├─ driver_monthly_metric.go
 │  │  │  ├─ facility.go
 │  │  │  ├─ fuel_purchase.go
 │  │  │  ├─ load.go
@@ -56,8 +56,6 @@ LRDB
 │  ├─ trips.csv
 │  ├─ trucks.csv
 │  └─ truck_utilization_metrics.csv
-├─ driver
-│  └─ postgresql.jar
 ├─ LICENSE
 ├─ main.py
 ├─ pyproject.toml
@@ -65,7 +63,12 @@ LRDB
 ├─ scripts
 │  └─ mongo_to_postgres.py
 ├─ sql
-│  └─ 01_lp_delete_tables.sql
+│  ├─ 01_lp_delete_tables.sql
+│  ├─ 02_public_tables.sql
+│  ├─ 03_count.sql
+│  ├─ 04_fuel_purchase_overview.sql
+│  ├─ 05_drivers.sql
+│  └─ 06_fn_customer_report.sql
 ├─ tests
 ├─ utils
 │  ├─ connection.py
