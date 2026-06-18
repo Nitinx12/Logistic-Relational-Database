@@ -1,22 +1,48 @@
-# Fleet Management Database Scripts
+# Trucking & Logistics Data Analytics Suite
 
 ## Overview
-This folder contains a collection of PostgreSQL scripts designed for a trucking and fleet management database. The scripts range from basic database utility and validation queries to complex analytical reports and dynamic Pl/pgSQL functions. Together, they provide a comprehensive toolkit for managing database schemas, monitoring fleet operations, and generating business intelligence reports.
 
-## File Contents
+This directory contains a comprehensive suite of advanced PostgreSQL scripts designed for an end-to-end trucking and logistics data warehouse. The files encompass the full SQL lifecycle: from database teardown and schema inspection to exploratory data analysis (EDA), advanced parameterized reporting functions, financial validation triggers, and an automated operational feedback loop.
 
-### Utility & Validation Scripts
-* **`01_lp_drop_all_tables.sql`**: Contains a PL/pgSQL block that iterates through the `public` schema and drops all existing tables using `CASCADE`.
-* **`02_list_table_columns.sql`**: Queries the `information_schema.columns` to extract a list of all table names, column names, and data types currently active in the `public` schema.
-* **`03_database_row_counts.sql`**: Uses a `UNION ALL` statement to quickly return the total row counts for all major tables in the database, including `trucks`, `trailers`, `drivers`, `customers`, `routes`, `facilities`, `loads`, `trips`, `fuel_purchases`, `maintenance_records`, `safety_incidents`, `delivery_events`, and metrics tables.
+These scripts demonstrate advanced SQL patterns including dynamic SQL execution, Common Table Expressions (CTEs), autonomous transactions (via `dblink`), PL/pgSQL stored procedures, and complex data aggregations.
 
-### Data Analysis Queries
-* **`04_fuel_analytics_report.sql`**: Analyzes fuel purchase data by calculating total spend, average cost per fill, and identifying the top 10 states and top 10 drivers by fuel spend.
-* **`05_truck_fleet_analysis.sql`**: Provides a status breakdown of the fleet by grouping trucks by their current status, manufacturer make, fuel type, and age/model year distribution.
+## File Contents & Directory Structure
 
-### Advanced Reporting Functions (PL/pgSQL)
-* **`06_fn_customers_report.sql`**: Creates the `fn_customers_report` function, which generates customer-level performance reports combining master data with load volume, revenue, and on-time delivery percentages over an optional date window.
-* **`07_fn_drivers_report.sql`**: Creates the `fn_drivers_report` function to evaluate driver performance by aggregating total trips, miles driven, revenue generated, average MPG, and safety incident history.
-* **`08_fn_trucks_report.sql`**: Creates the `fn_trucks_report` function to analyze truck-level profitability and utilization by tracking revenue, fuel purchase costs, maintenance events, and calculating the overall cost-per-mile.
-* **`09_fn_routes_report.sql`**: Creates the `fn_routes_report` function, providing a route/lane-level analysis that compares planned transit distances against actual driven miles, while also calculating detention minutes and on-time delivery rates.
-* **`10_fn_sales_report.sql`**: Creates the `fn_sales_report` function, which utilizes dynamic SQL to generate flexible sales reports that aggregate load revenue, fuel surcharges, and accessorial charges into customizable daily, weekly, monthly, or quarterly time buckets.
+The files are sequentially numbered for logical execution and grouped into functional categories:
+
+### 1. Utility & Schema Inspection
+Scripts for resetting environments and understanding table structures and volumes.
+* **`01_lp_drop_all_tables.sql`**: A PL/pgSQL block that dynamically drops all tables in the `public` schema. Useful for clean environment resets.
+* **`02_list_table_columns.sql`**: Queries the `information_schema` to generate a data dictionary, listing all tables, columns, and their data types.
+* **`03_database_row_counts.sql`**: Uses `UNION ALL` to compute and rank record counts across all major tables (trucks, loads, drivers, facilities, etc.) to assess data volume.
+
+### 2. Exploratory Data Analysis (EDA)
+Quick analytical queries to understand high-level operational metrics.
+* **`04_fuel_analytics_report.sql`**: Aggregates fuel purchase data to report on total spend, average cost per gallon, and ranks fuel spend by state and by driver.
+* **`05_truck_fleet_analysis.sql`**: Analyzes fleet composition, including status breakdowns, make/model distributions, fuel types, and average tank capacities based on vehicle age.
+
+### 3. Advanced Parameterized Reporting Functions
+A collection of PL/pgSQL functions that act as a reporting API. These functions accept optional parameters (date ranges, statuses, types) to generate dynamic, granular metrics without fanning out joins.
+* **`06_fn_customers_report.sql`**: Generates customer-level performance metrics (load volume, revenue, and on-time delivery percentages).
+* **`07_fn_drivers_report.sql`**: Aggregates driver statistics, combining trip revenues, fuel efficiency (MPG), idle hours, and safety incident histories.
+* **`08_fn_trucks_report.sql`**: Produces a truck-level fleet report that calculates total miles, average MPG, revenue per mile, and cost per mile (combining fuel and maintenance).
+* **`09_fn_routes_report.sql`**: Analyzes route and lane performance, calculating revenue per mile, on-time delivery rates, and mileage variance (planned vs. actual).
+* **`10_fn_sales_report.sql`**: Utilizes dynamic SQL to aggregate load revenue, fuel surcharges, and accessorial charges into flexible time buckets (daily, weekly, monthly, quarterly).
+* **`11_fn_facilities_report.sql`**: Reports on dock and detention performance at the facility level, normalizing event counts and detention minutes by the number of dock doors.
+
+### 4. Data Quality & Financial Validation
+Ensures data integrity and surfaces discrepancies between live facts and materialized views.
+* **`12_fn_metrics_reconciliation_report.sql`**: Compares dynamically computed monthly metrics (from raw trip/load data) against pre-aggregated tables to catch data drift or bugs, flagging significant variances.
+* **`13_trg_financial_validation.sql`**: Implements `BEFORE INSERT/UPDATE` triggers that reject invalid financial records (e.g., negative revenue, mismatched maintenance costs). It uses the `dblink` extension to log rejected attempts via autonomous transactions without rolling back the log entry.
+
+### 5. Automated Operational Feedback
+A proactive alerting system for continuous monitoring.
+* **`14_lp_operational_feedback.sql`**: A complete operational feedback loop. It defines KPI thresholds and creates a master stored procedure (`run_feedback_loop`) that calls individual checks across domains (Driver, Fleet, Safety, Delivery, Fuel, Maintenance). It logs warnings and critical alerts into an `operational_alerts` table, which is surfaced via a `v_open_alerts` view.
+
+## Key SQL Concepts Demonstrated
+* **PL/pgSQL Functions & Procedures**: Encapsulating complex business logic into reusable database functions.
+* **Dynamic SQL**: Using `EXECUTE format(...)` to reshape output schemas on the fly based on user input (e.g., date granularities).
+* **Data Integrity Enforcement**: Leveraging Trigger Functions for advanced row-level validation.
+* **Autonomous Transactions**: Utilizing `dblink` for audit logging within rolled-back transactions.
+* **Advanced Aggregation Filters**: Extensive use of `COUNT(...) FILTER (WHERE ...)` for precise conditional aggregations without subqueries.
+* **Avoidance of Join Fan-Out**: Pre-aggregating one-to-many relationships within CTEs before joining them to master entity lists.
