@@ -1,4 +1,4 @@
-# LRDB --> Trucking & Logistics Data Platform
+# LRDB — Trucking & Logistics Data Platform
 
 LRDB is a batch-oriented analytics platform built around a trucking and logistics operation. It takes a set of flat source files, stages them in MongoDB, syncs them incrementally into a PostgreSQL warehouse, and then layers data quality checks, parameterized reporting functions, financial validation, and operational alerting on top of that warehouse.
 
@@ -9,6 +9,17 @@ This README covers the whole repository at a glance. For the full system design,
 The platform models a typical trucking operation end to end: customers book loads, loads are carried over routes, trips execute those loads with a driver, truck, and trailer, and a handful of supporting tables record what actually happened — delivery events, fuel purchases, maintenance, and safety incidents. Two rollup tables summarize driver and truck performance month by month, and three monitoring tables (`kpi_thresholds`, `operational_alerts`, `financial_validation_log`) watch over the data and flag problems.
 
 Everything downstream of the warehouse — data quality, reporting, alerting — only reads from PostgreSQL. Nothing writes back upstream to MongoDB, and MongoDB never writes back to the source CSVs.
+
+## Tech Stack
+
+| Layer | Tools |
+|---|---|
+| Language / packaging | Python, managed with `uv` |
+| Staging store | MongoDB, accessed via PyMongo |
+| Warehouse | PostgreSQL, accessed via `psycopg2` and SQLAlchemy |
+| Data shaping | pandas |
+| Warehouse logic | PL/pgSQL functions, stored procedures, and triggers, plus the `dblink` extension for autonomous transactions |
+| Reporting output | Markdown reports with PNG charts (pandas, matplotlib, seaborn) |
 
 ## Repository Layout
 
@@ -73,9 +84,33 @@ Full table-by-table mapping and the entity-relationship diagram are in `docs/dat
 
 ## Getting Started
 
-### 1. Environment
+### 1. Prerequisites
 
-The Python environment is managed with `uv` (`pyproject.toml`, `uv.lock`, `.python-version`). Create a `.env` file at the project root:
+- Python 3.x, managed via [`uv`](https://docs.astral.sh/uv/) (the project ships `pyproject.toml`, `uv.lock`, and `.python-version`, so `uv` will pick up the right interpreter automatically)
+- A running PostgreSQL instance with the `dblink` extension available (used by the financial validation trigger in `sql/13`)
+- A running MongoDB instance, pre-loaded with the entity collections (see the limitations section below — how the source CSVs get into MongoDB is not covered by this repository)
+- `git`
+
+### 2. Clone the repository
+
+```bash
+git clone <repository-url> LRDB
+cd LRDB
+```
+
+Replace `<repository-url>` with the actual clone URL for this repo (HTTPS or SSH, depending on how it is hosted).
+
+### 3. Install dependencies
+
+```bash
+uv sync
+```
+
+This creates a `.venv` in the project root and installs everything pinned in `uv.lock`. If you would rather use plain `pip`, a `requirements.txt` can be generated from the lock file with `uv export --format requirements-txt > requirements.txt` and installed in a virtual environment of your choice.
+
+### 4. Configure environment variables
+
+Create a `.env` file at the project root:
 
 ```env
 POSTGRES_HOST=localhost
@@ -88,22 +123,30 @@ MONGO_URI=mongodb://localhost:XXXXX
 MONGO_DB=your_mongo_db
 ```
 
-`utils/connection.py` validates all seven variables are present the moment it is imported, so a missing credential fails immediately at startup rather than partway through a run.
+`utils/connection.py` validates all seven variables are present the moment it is imported, so a missing credential fails immediately at startup rather than partway through a run. Keep `.env` out of version control — it should already be covered by `.gitignore`.
 
-### 2. Run the ETL
+### 5. Run the ETL
 
 ```bash
-python scripts/mongo_to_postgres.py                                  # full incremental sync, all collections
-python scripts/mongo_to_postgres.py --collection trucks               # one collection only
-python scripts/mongo_to_postgres.py --collection trucks --table trucks_raw
-python scripts/mongo_to_postgres.py --full-refresh                    # drops and reloads everything, ignores watermark
+uv run python scripts/mongo_to_postgres.py                            # full incremental sync, all collections
+uv run python scripts/mongo_to_postgres.py --collection trucks         # one collection only
+uv run python scripts/mongo_to_postgres.py --collection trucks --table trucks_raw
+uv run python scripts/mongo_to_postgres.py --full-refresh              # drops and reloads everything, ignores watermark
 ```
+
+(Drop the `uv run` prefix if you activated the virtual environment yourself with `source .venv/bin/activate`.)
 
 This pulls each MongoDB collection in batches of 25,000 documents, keeping only documents newer than the saved watermark, casts columns into PostgreSQL types, and appends them into the matching table. See `docs/incremental.md` for a full walkthrough of how the watermark logic, type mapping, and table creation work underneath.
 
-### 3. Build the warehouse and run the SQL layers
+### 6. Build the warehouse and run the SQL layers
 
-The `sql/` directory is numbered for sequential execution:
+The `sql/` directory is numbered for sequential execution. Run each script against your PostgreSQL database with `psql` (or any SQL client), in order:
+
+```bash
+psql "$DATABASE_URL" -f sql/01_lp_drop_all_tables.sql
+psql "$DATABASE_URL" -f sql/02_list_table_columns.sql
+# ...continue through sql/14_lp_operational_feedback.sql
+```
 
 | Range | Purpose |
 |---|---|
@@ -113,7 +156,7 @@ The `sql/` directory is numbered for sequential execution:
 | `12`–`13` | Metrics reconciliation and the financial validation trigger |
 | `14` | Operational feedback loop and alerting |
 
-### 4. Run the data quality procedures
+### 7. Run the data quality procedures
 
 ```sql
 CALL proc_customer_data_quality();
@@ -141,6 +184,22 @@ Each procedure checks its table for nulls, duplicates, invalid formats, out-of-r
 **`reports/`** — markdown reports generated from the `sql/06`–`08` reporting functions, illustrated with PNGs from `assets/`. `customer_report.md` covers portfolio revenue, segmentation, and delivery performance across 200 customers. `truck_report.md` covers fleet revenue, fuel efficiency by make, and maintenance cost concentration across 120 trucks. `driver_report.md` follows the same pattern for drivers.
 
 **`docs/`** — `architecture.md` for the full system design and data flow, and `datacatlog.md` for the table relationship map and entity-relationship diagram.
+
+## Logs
+
+`utils/logger.py` writes timestamped log files under `logs/<stage>/<name>_<timestamp>.log` for whichever stage a script declares (`extraction`, `transformation`, or `loading`). Console output is `INFO` and above; the file itself captures `DEBUG` and above. This directory is created automatically the first time a script runs, so there is nothing to set up ahead of time.
+
+## Troubleshooting
+
+- **`EnvironmentError` on startup** — one of the seven required variables is missing from `.env`. Check the variable names exactly match those listed in the configuration step above.
+- **ETL pulls every row every time** — the collection's documents are missing the `updated_at` field, or `watermark.json` was deleted or reset. Without a watermark, the script always does a full pull for that collection.
+- **A new MongoDB field shows up as text instead of a number in Postgres** — add the field name to `BIGINT_COLS` or `NUMERIC_COLS` inside `extract_schema_and_flatten()` in `scripts/mongo_to_postgres.py`.
+- **Duplicate rows for the same `*_id` after a re-sync** — expected behavior for mutable records under the current append-only design; see the limitations section below.
+- **`dblink` errors when running `sql/13_trg_financial_validation.sql`** — confirm the `dblink` extension is installed and enabled on the target PostgreSQL database (`CREATE EXTENSION IF NOT EXISTS dblink;`).
+
+## Contributing
+
+This is a small, single-pipeline project rather than a library with a formal contribution process, but the usual workflow applies: branch off, make a change, and make sure the relevant data quality procedures in `tests/` still pass clean against a real warehouse before opening a pull request. If you add a new MongoDB field that should map to `BIGINT` or `NUMERIC` in Postgres, remember to update the hardcoded column sets mentioned in the troubleshooting section above.
 
 ## Known Limitations
 
