@@ -24,7 +24,7 @@ This report covers the full customer base (200 accounts) with no date, type, or 
 
 ### 1.1 Top 10 Customers by Revenue
 
-![alt text](top10_revenue.png)
+![alt text](../assets/customer_report/top10_revenue.png)
 
 | customer_name      | customer_type   | account_status   | total_revenue   |
 |:-------------------|:----------------|:-----------------|:----------------|
@@ -43,7 +43,7 @@ Revenue is heavily concentrated at the top: the top 10 accounts alone represent 
 
 ### 1.2 Revenue Captured vs. Annual Revenue Potential
 
-![alt text](revenue_vs_potential.png)
+![alt text](<../assets/customer_report/revenue_vs_potential (1).png>)
 
 The dashed line marks 100% of stated annual potential. Nearly every account sits **above** that line — actual revenue captured routinely exceeds the `annual_revenue_potential` figure on file, in some cases by 10–25x. This is a useful signal, but it likely means the `annual_revenue_potential` field is a stale or conservative baseline (e.g. set at contract signing and never refreshed) rather than a true ceiling. **Recommendation:** revisit how/when `annual_revenue_potential` is set in the `customers` table — as-is, the `revenue_potential_utilization_pct` metric is hard to use for genuine whitespace analysis.
 
@@ -51,7 +51,7 @@ The dashed line marks 100% of stated annual potential. Nearly every account sits
 
 Bottom 10 accounts by utilization (closest to their stated potential, and the most "normal" relative to the rest of the book):
 
-![alt text](underutilized.png)
+![alt text](../assets/customer_report/underutilized.png)
 
 | customer_name             | annual_revenue_potential   | total_revenue   | revenue_potential_utilization_pct   |
 |:--------------------------|:---------------------------|:----------------|:------------------------------------|
@@ -82,7 +82,7 @@ Top 5 accounts by utilization (furthest **above** stated potential):
 
 ### 2.1 Revenue by Customer Type
 
-![alt text](revenue_by_type.png)
+![alt text](../assets/customer_report/revenue_by_type.png)
 
 | Customer Type | Total Revenue | Avg Revenue / Customer | # Customers |
 |---|---|---|---|
@@ -94,7 +94,7 @@ Revenue is balanced across all three customer types — no single type dominates
 
 ### 2.2 Active vs. Inactive Accounts
 
-![alt text](active_inactive.png)
+![alt text](../assets/customer_report/active_inactive.png)
 
 **168** of **200** customers (84.0%) are currently Active, generating **$439,822,404** (83.8% of total revenue). The **32** Inactive accounts still carry **$85,229,197** in historical revenue — worth a pass to see if any are reasonable win-back candidates given the size of that number.
 
@@ -102,7 +102,7 @@ Revenue is balanced across all three customer types — no single type dominates
 
 ## 3. Delivery Performance
 
-![alt text](delivery_distribution.png)
+![alt text](../assets/customer_report/delivery_distribution.png)
 
 On-time delivery performance clusters tightly between roughly 50% and 61% across the *entire* customer base — there is no group of accounts performing well and another performing poorly. That tight, low band points to a **systemic operational issue** (routing, driver scheduling, facility dwell times, etc.) rather than account-specific service failures.
 
