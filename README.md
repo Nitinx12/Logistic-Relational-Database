@@ -73,9 +73,9 @@ The warehouse itself has no declared foreign keys anywhere except primary keys o
 customers ──┐
             ├──▶ loads ──▶ trips ──▶ (drivers + trucks + trailers)
 routes ─────┘                │
-                              ├──▶ delivery_events  (+ facilities)
-                              ├──▶ fuel_purchases    (+ trucks, drivers)
-                              └──▶ safety_incidents  (+ trucks, drivers)
+                             ├──▶ delivery_events  (+ facilities)
+                             ├──▶ fuel_purchases    (+ trucks, drivers)
+                             └──▶ safety_incidents  (+ trucks, drivers)
 
 maintenance_records ──▶ trucks
 ```
