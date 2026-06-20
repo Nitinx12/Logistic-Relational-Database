@@ -127,7 +127,7 @@ MONGO_DB=your_mongo_db
 
 ### 5. Run the ETL
 
-```bash
+```Python
 uv run python scripts/mongo_to_postgres.py                            # full incremental sync, all collections
 uv run python scripts/mongo_to_postgres.py --collection trucks         # one collection only
 uv run python scripts/mongo_to_postgres.py --collection trucks --table trucks_raw
@@ -158,7 +158,7 @@ psql "$DATABASE_URL" -f sql/02_list_table_columns.sql
 
 ### 7. Run the data quality procedures
 
-```sql
+```SQL
 CALL proc_customer_data_quality();
 CALL proc_driver_data_quality();
 CALL proc_delivery_events_data_quality();
