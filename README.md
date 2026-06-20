@@ -1,4 +1,4 @@
-# LRDB — Trucking & Logistics Data Platform
+# LRDB --> Trucking & Logistics Data Platform
 
 LRDB is a batch-oriented analytics platform built around a trucking and logistics operation. It takes a set of flat source files, stages them in MongoDB, syncs them incrementally into a PostgreSQL warehouse, and then layers data quality checks, parameterized reporting functions, financial validation, and operational alerting on top of that warehouse.
 
