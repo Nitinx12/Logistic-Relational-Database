@@ -278,6 +278,7 @@ dependencies = [
     { name = "pyspark" },
     { name = "rich" },
     { name = "seaborn" },
+    { name = "sql" },
     { name = "sqlalchemy" },
 ]
 
@@ -290,9 +291,10 @@ requires-dist = [
     { name = "pandas", specifier = ">=3.0.3" },
     { name = "psycopg2-binary", specifier = ">=2.9.12" },
     { name = "pymongo", specifier = ">=4.17.0" },
-    { name = "pyspark", specifier = ">=4.1.2" },
+    { name = "pyspark", specifier = "==3.5.9" },
     { name = "rich", specifier = ">=15.0.0" },
     { name = "seaborn", specifier = ">=0.13.2" },
+    { name = "sql", specifier = ">=2022.4.0" },
     { name = "sqlalchemy", specifier = ">=2.0.51" },
 ]
 
@@ -625,12 +627,12 @@ wheels = [
 
 [[package]]
 name = "pyspark"
-version = "4.1.2"
+version = "3.5.9"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "py4j" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/5e/71/4dd20c69332a2a4bf7ece8a655c9da98e4bd9b6bcea235349c1a00399d57/pyspark-4.1.2.tar.gz", hash = "sha256:fa5d6159f700d0990a07f4f62df1b7449401dccee9cd7d5d6df8957530841602", size = 455428043, upload-time = "2026-05-21T14:49:21.785Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/95/ce/81e53e729790556e3983e95de1a7d5df91a34adfcd34b5a5ab0e0c6e9b33/pyspark-3.5.9.tar.gz", hash = "sha256:ea27adc39ddac9413b8951e45aa748cbed6c785971b81386efc41938f6243d93", size = 317858593, upload-time = "2026-07-16T08:52:04.494Z" }
 
 [[package]]
 name = "python-dateutil"
@@ -688,6 +690,12 @@ sdist = { url = "https://files.pythonhosted.org/packages/94/e7/b2c673351809dca68
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b7/ce/149a00dd41f10bc29e5921b496af8b574d8413afcd5e30dfa0ed46c2cc5e/six-1.17.0-py2.py3-none-any.whl", hash = "sha256:4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274", size = 11050, upload-time = "2024-12-04T17:35:26.475Z" },
 ]
+
+[[package]]
+name = "sql"
+version = "2022.4.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/55/c3/5698668c0d767bbca80d19b8c49c937e2ffc087e5a82c954c463400c4fd3/sql-2022.4.0.tar.gz", hash = "sha256:f8cae71ac27e8bf763c4313497ba68f7e6ec577a1eb997738aaad3b3d5f7a600", size = 4176, upload-time = "2022-03-06T06:08:16.314Z" }
 
 [[package]]
 name = "sqlalchemy"
