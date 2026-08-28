@@ -23,7 +23,7 @@
 -- Author        : Nitin
 -- Created Date  : 2026-06-18
 -- ============================================================================
-CREATE OR REPLACE proc_customer_data_quality()
+CREATE OR REPLACE PROCEDURE  proc_customer_data_quality()
 LANGUAGE plpgsql
 AS $$
 
