@@ -2,6 +2,11 @@ import logging
 import os
 from datetime import datetime
 
+# utils/logger.py -> project root is one level up from this file's folder.
+_UTILS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(_UTILS_DIR)
+
+
 def get_logger(stage: str, name: str) -> logging.Logger:
     valid_stages = ["Mongo Extract", "extraction", "transformation", "loading"]
     if stage not in valid_stages:
@@ -9,8 +14,10 @@ def get_logger(stage: str, name: str) -> logging.Logger:
             f"Invalid stage '{stage}'. Must be one of: {valid_stages}"
         )
 
-    # Create logs/<stage>/ folder
-    log_dir = os.path.join("logs", stage)
+    # Create <project_root>/logs/<stage>/ folder — resolved from this file's
+    # location, not the caller's cwd, so it always lands in the same place
+    # no matter which directory the script was run from.
+    log_dir = os.path.join(PROJECT_ROOT, "logs", stage)
     os.makedirs(log_dir, exist_ok=True)
 
     # Log file: logs/<stage>/<name>_2024-06-01_12-00.log
