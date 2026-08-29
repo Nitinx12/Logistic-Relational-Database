@@ -54,16 +54,16 @@ Everything downstream of the warehouse — data quality, reporting, alerting —
 ## Connect
 
 ```bash
-git clone <repository-url> LRDB
+git clone https://github.com/Nitinx12/Logistic-Relational-Database
 cd LRDB
 uv sync
 ```
 
-Add a `.env` at the project root (Postgres + Mongo credentials — see `utils/connection.py` for the exact variable names), then:
+Add a `.env` at the project root (Postgres + Mongo credentials see `utils/connection.py` for the exact variable names), then:
 
 ```bash
-uv run python scripts/mongo_to_postgres.py          # sync Mongo -> Postgres
-psql "$DATABASE_URL" -f sql/01_lp_drop_all_tables.sql  # ...through sql/14, in order
+uv run python scripts/mongo_to_postgres.py              # sync Mongo -> Postgres
+psql "$DATABASE_URL" -f sql/01_lp_drop_all_tables.sql   # ...through sql/14, in order
 ```
 
 Full setup, the SQL execution order, and data-quality procedures are detailed in the docs above.
