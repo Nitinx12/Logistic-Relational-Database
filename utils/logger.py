@@ -8,7 +8,7 @@ PROJECT_ROOT = os.path.dirname(_UTILS_DIR)
 
 
 def get_logger(stage: str, name: str) -> logging.Logger:
-    valid_stages = ["Mongo Extract", "extraction", "transformation", "loading"]
+    valid_stages = ["Mongo Extract", "extraction", "transformation", "loading", "tests"]
     if stage not in valid_stages:
         raise ValueError(
             f"Invalid stage '{stage}'. Must be one of: {valid_stages}"
