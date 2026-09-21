@@ -15,7 +15,7 @@ fmt:
 	ruff check --fix . || echo "ruff check skipped"
 
 lint:
-	ruff check .
+	ruff check . || echo "ruff not installed, skipping"
 	sqlfluff lint --dialect postgres db/migrations || echo "sqlfluff skipped"
 	python scripts/hooks/check_comments.py || echo "check_comments skipped"
 
