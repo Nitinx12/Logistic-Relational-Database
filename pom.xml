@@ -22,7 +22,7 @@
     <spark.version>3.5.1</spark.version>
     <delta.version>2.4.0</delta.version>
     <spring-boot.version>3.2.5</spring-boot.version>
-    <mongodb-driver.version>4.11.1</mongodb-driver.version>
+    <mongodb-driver.version>4.11.2</mongodb-driver.version>
     <aws-sdk.version>2.25.0</aws-sdk.version>
     <jackson.version>2.15.4</jackson.version>
     <postgresql.version>42.7.3</postgresql.version>
