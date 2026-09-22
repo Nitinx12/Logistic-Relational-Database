@@ -24,7 +24,7 @@
     <spring-boot.version>3.2.5</spring-boot.version>
     <mongodb-driver.version>4.11.1</mongodb-driver.version>
     <aws-sdk.version>2.25.0</aws-sdk.version>
-    <jackson.version>2.15.3</jackson.version>
+    <jackson.version>2.15.4</jackson.version>
     <postgresql.version>42.7.3</postgresql.version>
     <awaitility.version>4.2.0</awaitility.version>
     <testcontainers.version>1.19.8</testcontainers.version>
