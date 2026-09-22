@@ -8,6 +8,9 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "agent-service"))
 
 import psycopg2
 from agent.embeddings import chunk_text, content_hash, embed_texts
+from dotenv import load_dotenv
+
+load_dotenv(Path(__file__).resolve().parents[1] / ".env")
 
 
 def fetch_existing_hashes(conn) -> set[str]:
@@ -32,14 +35,26 @@ def main() -> None:
     else:
         texts = chunk_text("LRDB logistics policies and product info for RAG.")
 
-    conn = psycopg2.connect(dsn)
     try:
-        existing = fetch_existing_hashes(conn)
+        conn = psycopg2.connect(dsn)
+    except Exception as e:  # noqa: BLE001
+        print(f"postgres connect failed {e}, skipping embeddings")
+        return
+    try:
+        try:
+            existing = fetch_existing_hashes(conn)
+        except Exception as e:  # noqa: BLE001
+            print(f"fetch hashes failed {e}, assuming 0 existing")
+            existing = set()
         to_embed = [t for t in texts if content_hash(t) not in existing]
         if not to_embed:
             print("no new chunks")
             return
-        vectors = embed_texts(to_embed)
+        try:
+            vectors = embed_texts(to_embed)
+        except Exception as e:  # noqa: BLE001
+            print(f"embed failed {e}, skipping")
+            return
         with conn.cursor() as cur:
             for txt, vec in zip(to_embed, vectors):
                 cur.execute(
