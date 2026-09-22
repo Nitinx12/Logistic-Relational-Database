@@ -1,7 +1,8 @@
-# Build output
+# Build output (keep Maven wrapper)
 target/
 *.class
 *.jar
+!.mvn/wrapper/maven-wrapper.jar
 
 # Python-generated files
 __pycache__/
