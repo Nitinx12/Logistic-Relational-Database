@@ -1,14 +1,15 @@
 """Manual backfill: snapshot Mongo collection to landing and full rebuild."""
 
+from datetime import datetime, timedelta, timezone
+
 from airflow import DAG
 from airflow.operators.bash import BashOperator
-from datetime import datetime, timedelta
 
 default_args = {"owner": "lrdb", "retries": 1, "retry_delay": timedelta(minutes=1)}
 
 with DAG(
     dag_id="pipeline_backfill",
-    start_date=datetime(2024, 1, 1),
+    start_date=datetime(2024, 1, 1, tzinfo=timezone.utc),
     schedule_interval=None,
     catchup=False,
     max_active_runs=1,
