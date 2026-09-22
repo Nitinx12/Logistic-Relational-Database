@@ -28,6 +28,7 @@
     <postgresql.version>42.7.3</postgresql.version>
     <awaitility.version>4.2.0</awaitility.version>
     <testcontainers.version>1.19.8</testcontainers.version>
+    <scalatest.version>3.2.18</scalatest.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.compiler.release>17</maven.compiler.release>
   </properties>
@@ -87,6 +88,12 @@
         <groupId>io.delta</groupId>
         <artifactId>delta-core_${scala.binary.version}</artifactId>
         <version>${delta.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalatest</groupId>
+        <artifactId>scalatest_${scala.binary.version}</artifactId>
+        <version>${scalatest.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
