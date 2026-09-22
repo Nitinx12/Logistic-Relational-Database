@@ -37,9 +37,14 @@ with DAG(
         bash_command="psql $POSTGRES_JDBC_URL -c 'INSERT INTO ops.load_runs SELECT md5(now()::text), \"load_facts\", 0, now(), now() ON CONFLICT DO NOTHING;'",
     )
 
+    refresh_embeddings = BashOperator(
+        task_id="refresh_embeddings",
+        bash_command="python /opt/airflow/scripts/refresh_embeddings.py",
+    )
+
     freshness_check = BashOperator(
         task_id="freshness_check",
         bash_command="echo freshness_check && psql $POSTGRES_JDBC_URL -c 'SELECT max(finished_at) FROM ops.load_runs;'",
     )
 
-    ingest_bronze >> dq_gate >> load_postgres >> freshness_check
+    ingest_bronze >> dq_gate >> load_postgres >> refresh_embeddings >> freshness_check
